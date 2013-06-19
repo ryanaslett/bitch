@@ -1,14 +1,17 @@
 <?php
-
 /**
  * @file
- * Provide views data and handlers for user.module.
- *
- * @ingroup views_module_handlers
+ * Provide views data and handlers for user.module
  */
 
 /**
- * Implements hook_views_data().
+ * @defgroup views_user_module user.module handlers
+ *
+ * @{
+ */
+
+/**
+ * Implements hook_views_data()
  */
 function user_views_data() {
   // ----------------------------------------------------------------
@@ -69,16 +72,6 @@ function user_views_data() {
       'base field' => 'uid',
       'field' => 'uid',
       'label' => t('nodes'),
-    ),
-  );
-
-  // uid_raw
-  $data['users']['uid_raw'] = array(
-    'help' => t('The raw numeric user ID.'),
-    'real field' => 'uid',
-    'filter' => array(
-      'title' => t('The user ID'),
-      'handler' => 'views_handler_filter_numeric',
     ),
   );
 
@@ -309,9 +302,6 @@ function user_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_boolean',
       'click sortable' => TRUE,
-      'output formats' => array(
-        'active-blocked' => array(t('Active'), t('Blocked')),
-      ),
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_boolean_operator',
@@ -396,7 +386,6 @@ function user_views_data() {
     'filter' => array(
       'handler' => 'views_handler_filter_user_roles',
       'numeric' => TRUE,
-      'allow empty' => TRUE,
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_users_roles_rid',
@@ -528,22 +517,11 @@ function user_views_data() {
 }
 
 /**
- * Implements hook_views_plugins().
+ * Implements hook_views_plugins
  */
 function user_views_plugins() {
   return array(
     'module' => 'views', // This just tells our themes are elsewhere.
-    'row' => array(
-      'user' => array(
-        'title' => t('User'),
-        'help' => t('Display the user with standard user view.'),
-        'handler' => 'views_plugin_row_user_view',
-        'base' => array('users'), // only works with 'users' as base.
-        'uses options' => TRUE,
-        'type' => 'normal',
-        'help topic' => 'style-users',
-      ),
-    ),
     'argument default' => array(
       'user' => array(
         'title' => t('User ID from URL'),
@@ -573,3 +551,7 @@ function user_views_query_substitutions($view) {
   global $user;
   return array('***CURRENT_USER***' => intval($user->uid));
 }
+
+/**
+ * @}
+ */

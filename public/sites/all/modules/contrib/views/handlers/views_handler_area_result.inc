@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Definition of views_handler_area_result.
+ * Contains views_handler_area_result handler.
  */
 
 /**
  * Views area handler to display some configurable result summary.
  *
- * @ingroup views_area_handlers
+ * @ingroup views_area_handlers Views' area handlers
  */
 class views_handler_area_result extends views_handler_area {
 
   function option_definition() {
-    $options = parent::option_definition();
+    parent::option_definition();
 
     $options['content'] = array(
       'default' => 'Displaying @start - @end of @total',
@@ -33,7 +33,6 @@ class views_handler_area_result extends views_handler_area {
         '@name -- the human-readable name of the view',
         '@per_page -- the number of items per page',
         '@current_page -- the current page number',
-        '@current_record_count -- the current page record count',
         '@page_count -- the total page count',
       ),
     );
@@ -52,45 +51,42 @@ class views_handler_area_result extends views_handler_area {
    * Find out the information to render.
    */
   function render($empty = FALSE) {
-    // Must have options and does not work on summaries.
-    if (!isset($this->options['content']) || $this->view->plugin_name == 'default_summary') {
-      return;
-    }
-    $output = '';
-    $format = $this->options['content'];
-    // Calculate the page totals.
-    $current_page = (int) $this->view->get_current_page() + 1;
-    $per_page = (int) $this->view->get_items_per_page();
-    $count = count($this->view->result);
-    // @TODO: Maybe use a possible is views empty functionality.
-    // Not every view has total_rows set, use view->result instead.
-    $total = isset($this->view->total_rows) ? $this->view->total_rows : count($this->view->result);
-    $name = check_plain($this->view->human_name);
-    if ($per_page === 0) {
-      $page_count = 1;
-      $start = 1;
-      $end = $total;
-    }
-    else {
-      $page_count = (int) ceil($total / $per_page);
-      $total_count = $current_page * $per_page;
-      if ($total_count > $total) {
-        $total_count = $total;
+      // Must have options and does not work on summaries.
+      if (!isset($this->options['content']) || $this->view->plugin_name == 'default_summary') {
+        return;
       }
-      $start = ($current_page - 1) * $per_page + 1;
-      $end = $total_count;
+      $output = '';
+      $format = $this->options['content'];
+      // Calculate the page totals.
+      $current_page = (int) $this->view->get_current_page() + 1;
+      $per_page = (int) $this->view->get_items_per_page();
+      $count = count($this->view->result);
+      $total = $this->view->total_rows;
+      $name = check_plain($this->view->human_name);
+      $page_count = (int) ceil($total / $per_page);
+      if ($per_page === 0) {
+        $start = 1;
+        $end = $total;
+      }
+      else {
+        $total_count = $current_page * $per_page;
+        if ($total_count > $total) {
+          $total_count = $total;
+        }
+        $start = ($current_page - 1) * $per_page + 1;
+        $end = $total_count;
+      }
+      // Get the search information.
+      $items = array('start', 'end', 'total', 'name', 'per_page', 'current_page', 'page_count');
+      $replacements = array();
+      foreach ($items as $item) {
+        $replacements["@$item"] = ${$item};
+      }
+      // Send the output.
+      if (!empty($total)) {
+        $output .= filter_xss_admin(str_replace(array_keys($replacements), array_values($replacements), $format));
+      }
+      return $output;
     }
-    $current_record_count = ($end - $start) + 1;
-    // Get the search information.
-    $items = array('start', 'end', 'total', 'name', 'per_page', 'current_page', 'current_record_count', 'page_count');
-    $replacements = array();
-    foreach ($items as $item) {
-      $replacements["@$item"] = ${$item};
-    }
-    // Send the output.
-    if (!empty($total)) {
-      $output .= filter_xss_admin(str_replace(array_keys($replacements), array_values($replacements), $format));
-    }
-    return $output;
-  }
 }
+
