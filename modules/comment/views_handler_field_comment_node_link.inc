@@ -1,16 +1,10 @@
 <?php
-
-/**
- * @file
- * Definition of views_handler_field_comment_node_link.
- */
-
 /**
  * Handler for showing comment module's node link.
  *
  * @ingroup views_field_handlers
  */
-class views_handler_field_comment_node_link extends views_handler_field_entity {
+class views_handler_field_comment_node_link extends views_handler_field {
   function construct() {
     parent::construct();
 
@@ -28,7 +22,7 @@ class views_handler_field_comment_node_link extends views_handler_field_entity {
 
   function option_definition() {
     $options = parent::option_definition();
-    $options['teaser'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['teaser'] = array('default' => 0);
     return $options;
   }
 
@@ -38,6 +32,7 @@ class views_handler_field_comment_node_link extends views_handler_field_entity {
       '#title' => t('Show teaser-style link'),
       '#default_value' => $this->options['teaser'],
       '#description' => t('Show the comment link in the form used on standard node teasers, rather than the full node form.'),
+      '#fieldset' => 'more',
     );
 
     parent::options_form($form, $form_state);
@@ -50,7 +45,10 @@ class views_handler_field_comment_node_link extends views_handler_field_entity {
 
   function render($values) {
     // Build fake $node.
-    $node = $this->get_value($values);
+    $node = new stdClass();
+    $node->nid      = $this->get_value($values, 'nid');
+    $node->type     = $this->get_value($values, 'type');
+    $node->comment  = $this->get_value($values, 'comment');
 
     // Call comment.module's hook_link: comment_link($type, $node = NULL, $teaser = FALSE)
     // Call node by reference so that something is changed here

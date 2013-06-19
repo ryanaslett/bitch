@@ -1,11 +1,6 @@
 <?php
 
 /**
- * @file
- * Definition of views_handler_filter_string.
- */
-
-/**
  * Basic textfield filter to handle string filtering commands
  * including equality, like, not like, etc.
  *
@@ -18,7 +13,7 @@ class views_handler_filter_string extends views_handler_filter {
   function option_definition() {
     $options = parent::option_definition();
 
-    $options['expose']['contains']['required'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['expose']['contains']['required'] = array('default' => FALSE);
 
     return $options;
   }
@@ -148,9 +143,6 @@ class views_handler_filter_string extends views_handler_filter {
   }
 
   function admin_summary() {
-    if ($this->is_a_group()) {
-      return t('grouped');
-    }
     if (!empty($this->options['exposed'])) {
       return t('exposed');
     }
@@ -260,11 +252,6 @@ class views_handler_filter_string extends views_handler_filter {
   function op_word($field) {
     $where = $this->operator == 'word' ? db_or() : db_and();
 
-    // Don't filter on empty strings.
-    if (empty($this->value)) {
-      return;
-    }
-
     preg_match_all('/ (-?)("[^"]+"|[^" ]+)/i', ' ' . $this->value, $matches, PREG_SET_ORDER);
     foreach ($matches as $match) {
       $phrase = false;
@@ -277,7 +264,7 @@ class views_handler_filter_string extends views_handler_filter {
       $words = $phrase ? array($words) : preg_split('/ /', $words, -1, PREG_SPLIT_NO_EMPTY);
       foreach ($words as $word) {
         $placeholder = $this->placeholder();
-        $where->condition($field, '%' . db_like(trim($word, " ,!?")) . '%', 'LIKE');
+        $where->where("$field LIKE $placeholder", array($placeholder => '%' . db_like(trim($word, " ,!?")) . '%'));
       }
     }
 

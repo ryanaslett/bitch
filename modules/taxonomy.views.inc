@@ -1,14 +1,18 @@
 <?php
-
 /**
  * @file
- * Provide views data and handlers for taxonomy.module.
  *
- * @ingroup views_module_handlers
+ * Provide views data and handlers for taxonomy.module
  */
 
 /**
- * Implements hook_views_data().
+ * @defgroup views_taxonomy_module taxonomy.module handlers
+ *
+ * @{
+ */
+
+/**
+ * Implements hook_views_data()
  */
 function taxonomy_views_data() {
   $data = array();
@@ -86,24 +90,6 @@ function taxonomy_views_data() {
       'handler' => 'views_handler_field',
     ),
   );
-  $data['taxonomy_vocabulary']['weight'] = array(
-    'title' => t('Weight'),
-    'help' => t('The taxonomy vocabulary weight'),
-    'field' => array(
-      'handler' => 'views_handler_field_numeric',
-      'click sortable' => TRUE,
-    ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
-      'name field' => 'weight',
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort',
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
-    ),
-  );
 
   // ----------------------------------------------------------------------
  // taxonomy_term_data table
@@ -166,17 +152,6 @@ function taxonomy_views_data() {
     ),
   );
 
-  // raw tid field
-  $data['taxonomy_term_data']['tid_raw'] = array(
-    'title' => t('Term ID'),
-    'help' => t('The tid of a taxonomy term.'),
-    'real field' => 'tid',
-    'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
-      'allow empty' => TRUE,
-    ),
-  );
-
   $data['taxonomy_term_data']['tid_representative'] = array(
     'relationship' => array(
       'title' => t('Representative node'),
@@ -229,9 +204,6 @@ function taxonomy_views_data() {
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
-    ),
   );
 
   // Term description
@@ -241,9 +213,6 @@ function taxonomy_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_markup',
       'format' => array('field' => 'format'),
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_string',
     ),
   );
 
@@ -359,10 +328,6 @@ function taxonomy_views_data() {
       'base' => 'taxonomy_term_data',
       'field' => 'parent',
       'label' => t('Parent'),
-    ),
-    'filter' => array(
-      'help' => t('Filter the results of "Taxonomy: Term" by the parent pid.'),
-      'handler' => 'views_handler_filter_numeric',
     ),
     'argument' => array(
       'help' => t('The parent term of the term.'),
@@ -489,7 +454,7 @@ function taxonomy_field_views_data_views_data_alter(&$data, $field) {
 }
 
 /**
- * Implements hook_views_plugins().
+ * Implements hook_views_plugins
  */
 function taxonomy_views_plugins() {
   return array(
@@ -529,7 +494,6 @@ function views_taxonomy_set_breadcrumb(&$breadcrumb, &$argument) {
     }
     if (!empty($argument->options['use_taxonomy_term_path'])) {
       $path = taxonomy_term_uri($parent);
-      $path = $path['path'];
     }
     else {
       $args[$argument->position] = $parent->tid;
@@ -538,3 +502,7 @@ function views_taxonomy_set_breadcrumb(&$breadcrumb, &$argument) {
     $breadcrumb[$path] = check_plain($parent->name);
   }
 }
+
+/**
+ * @}
+ */
